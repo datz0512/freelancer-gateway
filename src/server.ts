@@ -1,3 +1,5 @@
+import http from 'http';
+
 import { StatusCodes } from 'http-status-codes';
 import { CustomError, IErrorResponse, winstonLogger } from '@datz0512/freelancer-shared';
 import { Logger } from 'winston';
@@ -7,7 +9,6 @@ import cors from 'cors';
 import hpp from 'hpp';
 import helmet from 'helmet';
 import compression from 'compression';
-import http from 'http';
 import { config } from '@gateway/config';
 
 import { elasticSearch } from '@gateway/elasticsearch';
@@ -40,8 +41,8 @@ export class GatewayServer {
         name: 'session',
         keys: [`${config.SECRET_KEY_ONE}`, `${config.SECRET_KEY_TWO}`],
         maxAge: 24 * 7 * 3600000,
-        secure: config.NODE_ENV !== 'development'
-        //sameSite: none
+        secure: config.NODE_ENV !== 'development',
+        sameSite: 'none'
       })
     );
     app.use(hpp());
