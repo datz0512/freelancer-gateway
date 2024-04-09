@@ -28,8 +28,13 @@ class AuthService {
     return response;
   }
 
+  async verifyEmail(token: string): Promise<AxiosResponse> {
+    const response: AxiosResponse = await axiosAuthInstance.put(`/verify-email`, token);
+    return response;
+  }
+
   async resendEmail(data: { userId: number; email: string }): Promise<AxiosResponse> {
-    const response: AxiosResponse = await axiosAuthInstance.put(`/resend-email`, data);
+    const response: AxiosResponse = await axiosAuthInstance.post(`/resend-email`, data);
     return response;
   }
 
@@ -63,8 +68,8 @@ class AuthService {
     return response;
   }
 
-  async seed(count: number): Promise<AxiosResponse> {
-    const response: AxiosResponse = await this.axiosService.axios.get(`/seed/${count}`);
+  async seed(count: string): Promise<AxiosResponse> {
+    const response: AxiosResponse = await this.axiosService.axios.put(`/seed/${count}`);
     return response;
   }
 }
