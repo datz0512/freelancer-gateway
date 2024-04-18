@@ -105,14 +105,14 @@ export class GatewayServer {
     });
   }
 
-  private async startServer(app: Application): Promise<void> {
+  private async startHttpServer(httpServer: http.Server): Promise<void> {
     try {
-      const httpServer: http.Server = new http.Server(app);
-      const socketIO: Server = await this.createSocketIO(httpServer);
-      this.startHttpServer(httpServer);
-      this.socketIOConnections(socketIO);
+      log.info(`Gateway server has started with process id ${process.pid}.`);
+      httpServer.listen(SERVER_PORT, () => {
+        log.info(`Gateway server running on port ${SERVER_PORT}.`);
+      });
     } catch (error) {
-      log.log('error', `GatewayService startServer() error method:`, error);
+      log.log('error', `GatewayService startHttpServer() error method:`, error);
     }
   }
 
@@ -132,19 +132,19 @@ export class GatewayServer {
     return io;
   }
 
-  private async startHttpServer(httpServer: http.Server): Promise<void> {
-    try {
-      log.info(`Gateway server has started with process id ${process.pid}.`);
-      httpServer.listen(SERVER_PORT, () => {
-        log.info(`Gateway server running on port ${SERVER_PORT}.`);
-      });
-    } catch (error) {
-      log.log('error', `GatewayService startServer() error method:`, error);
-    }
-  }
-
   private socketIOConnections(io: Server): void {
     const socketIOApp = new SocketIOAppHandler(io);
     socketIOApp.listen();
+  }
+
+  private async startServer(app: Application): Promise<void> {
+    try {
+      const httpServer: http.Server = new http.Server(app);
+      const socketIO: Server = await this.createSocketIO(httpServer);
+      this.startHttpServer(httpServer);
+      this.socketIOConnections(socketIO);
+    } catch (error) {
+      log.log('error', `GatewayService startServer() error method:`, error);
+    }
   }
 }
