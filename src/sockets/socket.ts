@@ -1,4 +1,4 @@
-import { winstonLogger } from '@datz0512/freelancer-shared';
+import { IMessageDocument, winstonLogger } from '@datz0512/freelancer-shared';
 import { config } from '@gateway/config';
 import { GatewayCache } from '@gateway/redis/gateway.cache';
 import { Server, Socket } from 'socket.io';
@@ -60,6 +60,17 @@ export class SocketIOAppHandler {
 
     chatSocketClient.on('connect-error', (error: SocketClient.DisconnectReason) => {
       log.log('error', 'ChatService socket connection error:', error);
+    });
+
+    //custom events
+
+    // Listen event from chat service
+    chatSocketClient.on('message received', (data: IMessageDocument) => {
+      this.io.emit('message received', data); // Sent event to frontend
+    });
+
+    chatSocketClient.on('message updated', (data: IMessageDocument) => {
+      this.io.emit('message updated', data); // Sent event to frontend
     });
   }
 }
