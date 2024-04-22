@@ -1,4 +1,4 @@
-import { IMessageDocument, winstonLogger } from '@datz0512/freelancer-shared';
+import { IMessageDocument, IOrderDocument, IOrderNotifcation, winstonLogger } from '@datz0512/freelancer-shared';
 import { config } from '@gateway/config';
 import { GatewayCache } from '@gateway/redis/gateway.cache';
 import { Server, Socket } from 'socket.io';
@@ -22,6 +22,7 @@ export class SocketIOAppHandler {
 
   public listen(): void {
     this.chatSocketServiceIOConnections();
+    this.orderSocketServiceIOConnections();
 
     this.io.on('connection', async (socket: Socket) => {
       socket.on('getLoggedInUsers', async () => {
@@ -60,8 +61,9 @@ export class SocketIOAppHandler {
       chatSocketClient.connect();
     });
 
-    chatSocketClient.on('connect-error', (error: SocketClient.DisconnectReason) => {
+    chatSocketClient.on('connect-error', (error: Error) => {
       log.log('error', 'ChatService socket connection error:', error);
+      chatSocketClient.connect();
     });
 
     //custom events
@@ -91,10 +93,14 @@ export class SocketIOAppHandler {
       orderSocketClient.connect();
     });
 
-    orderSocketClient.on('connect-error', (error: SocketClient.DisconnectReason) => {
+    orderSocketClient.on('connect-error', (error: Error) => {
       log.log('error', 'OrderService socket connection error:', error);
+      orderSocketClient.connect();
     });
 
     //custom events
+    orderSocketClient.on('order notification', (order: IOrderDocument, notification: IOrderNotifcation) => {
+      this.io.emit('order notification', order, notification); // Sent event to frontend
+    });
   }
 }
