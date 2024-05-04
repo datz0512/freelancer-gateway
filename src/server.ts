@@ -1,5 +1,6 @@
 import http from 'http';
 
+import 'express-async-errors';
 import { StatusCodes } from 'http-status-codes';
 import { CustomError, IErrorResponse, winstonLogger } from '@datz0512/freelancer-shared';
 import { Logger } from 'winston';
